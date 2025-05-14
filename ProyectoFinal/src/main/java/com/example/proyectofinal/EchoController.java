@@ -1,7 +1,7 @@
 package com.example.proyectofinal;
 
-import com.example.proyectofinal.Entity.Client;
-import com.example.proyectofinal.Repository.ClientRepository;
+import com.example.proyectofinal.Entity.User;
+import com.example.proyectofinal.Repository.UserRepository;
 import com.example.proyectofinal.ResponseRequest.RegisterRequest;
 import com.example.proyectofinal.ResponseRequest.RegisterResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +18,17 @@ import java.util.Optional;
 @RestController
 public class EchoController {
     @Autowired
-    ClientRepository repositoryClient;
+    UserRepository repositoryUser;
     @PostMapping("/auth/register")
     public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest) {
-        Optional<Client> existingClient = repositoryClient.findByUsername(registerRequest.getUsername());
+        Optional<User> existingClient = repositoryUser.findByUsername(registerRequest.getUsername());
 
         if (existingClient.isEmpty()) {
-            Client client = new Client();
-            client.setUsername(registerRequest.getUsername());
-            client.setEmail(registerRequest.getEmail());
-            client.setPassword(registerRequest.getPassword());
-            repositoryClient.save(client);
+            User user = new User();
+            user.setUsername(registerRequest.getUsername());
+            user.setEmail(registerRequest.getEmail());
+            user.setPassword(registerRequest.getPassword());
+            repositoryUser.save(user);
             return ResponseEntity.status(HttpStatus.OK).body(new RegisterResponse("Cliente registrado exitosamente"));
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new RegisterResponse("El cliente con ese nombre de usuario ya existe"));

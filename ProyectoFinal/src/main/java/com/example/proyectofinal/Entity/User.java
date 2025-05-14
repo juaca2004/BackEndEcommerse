@@ -2,10 +2,8 @@ package com.example.proyectofinal.Entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
-public class Client {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -17,11 +15,11 @@ public class Client {
     private String password;
 
 
-    public Client() {
+    public User() {
 
     }
 
-    public Client(String email, String username, String password) {
+    public User(String email, String username, String password) {
         this.email = email;
         this.username = username;
         this.password = password;
