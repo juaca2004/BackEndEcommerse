@@ -14,6 +14,10 @@ public class User {
 
     private String password;
 
+    // Relación uno a uno con Cart (bidireccional)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Cart cart;
+
 
     public User() {
 
@@ -48,4 +52,14 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public Cart getCart() {
+        return cart;
+    }
+
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+
 }
