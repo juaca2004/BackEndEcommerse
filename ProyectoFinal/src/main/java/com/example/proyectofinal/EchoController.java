@@ -2,15 +2,19 @@ package com.example.proyectofinal;
 
 import com.example.proyectofinal.Entity.Cart;
 import com.example.proyectofinal.Entity.User;
+import com.example.proyectofinal.Entity.Order;
 import com.example.proyectofinal.Repository.Cart_itemRepository;
+import com.example.proyectofinal.Repository.OrderRepository;
 import com.example.proyectofinal.Repository.UserRepository;
 import com.example.proyectofinal.ResponseRequest.RegisterRequest;
+import com.example.proyectofinal.ResponseRequest.*;
 import com.example.proyectofinal.ResponseRequest.RegisterResponse;
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @CrossOrigin(maxAge = 3600)
@@ -18,6 +22,9 @@ import java.util.Optional;
 public class EchoController {
     @Autowired
     UserRepository repositoryUser;
+
+    @Autowired
+    private OrderRepository orderRepository;
 
     @Autowired
     private Cart_itemRepository cartItemRepository;
@@ -57,6 +64,32 @@ public class EchoController {
             cartItemRepository.delete(item);
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
+    }
+
+
+    @PostMapping("/create")
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
+        Optional<User> userOptional = repositoryUser.findById(1L); // Usuario fijo para pruebas
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        }
+
+        User user = userOptional.get();
+
+
+        Order order = new Order();
+        order.setUser(user);
+        order.setCity(orderRequest.getShipping().getCity());
+        order.setAddress(orderRequest.getShipping().getAddress());
+        order.setFullName(orderRequest.getShipping().getFullName());
+        order.setTypePayment(orderRequest.getPaymentMethod());
+        order.setTotal(BigDecimal.valueOf(100)); // Puedes calcularlo dinámicamente con el carrito
+        order.setStatus("Exitosa");
+
+        orderRepository.save(order);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body("Orden creada exitosamente");
     }
 
 }
