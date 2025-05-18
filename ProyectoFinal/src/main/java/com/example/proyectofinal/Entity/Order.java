@@ -3,6 +3,7 @@ package com.example.proyectofinal.Entity;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -33,6 +34,9 @@ public class Order {
 
     @Column(length = 20)
     private String status = "pending";
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<Order_item> items;
 
     public Order() {}
 

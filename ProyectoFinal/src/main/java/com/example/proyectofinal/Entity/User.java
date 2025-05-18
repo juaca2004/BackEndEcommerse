@@ -2,6 +2,8 @@ package com.example.proyectofinal.Entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
+
 @Entity
 public class User {
     @Id
@@ -22,6 +24,9 @@ public class User {
     // Relación uno a uno con Cart (bidireccional)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Order> orders;
 
 
     public User() {
@@ -93,4 +98,11 @@ public class User {
     }
 
 
+    public List<Order> getOrders() {
+        return orders;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
+    }
 }
