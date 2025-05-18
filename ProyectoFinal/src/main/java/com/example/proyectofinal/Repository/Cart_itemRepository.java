@@ -4,6 +4,10 @@ import com.example.proyectofinal.Entity.Cart_item;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface Cart_itemRepository extends CrudRepository<Cart_item, Long> {
+
+    public List<Cart_item> findByProductId(Long productId);
 }

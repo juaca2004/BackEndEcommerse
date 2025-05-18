@@ -19,7 +19,7 @@ public class Cart_item {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    private int quantity = 1;
+    private int quantity;
 
     public Cart_item() {
     }

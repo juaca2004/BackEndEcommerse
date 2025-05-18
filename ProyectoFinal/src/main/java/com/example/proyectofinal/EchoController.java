@@ -1,10 +1,12 @@
 package com.example.proyectofinal;
 
 import com.example.proyectofinal.Entity.Cart;
+import com.example.proyectofinal.Entity.Product;
 import com.example.proyectofinal.Entity.User;
 import com.example.proyectofinal.Entity.Order;
 import com.example.proyectofinal.Repository.Cart_itemRepository;
 import com.example.proyectofinal.Repository.OrderRepository;
+import com.example.proyectofinal.Repository.ProductRepository;
 import com.example.proyectofinal.Repository.UserRepository;
 import com.example.proyectofinal.ResponseRequest.RegisterRequest;
 import com.example.proyectofinal.ResponseRequest.*;
@@ -15,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @CrossOrigin(maxAge = 3600)
@@ -27,6 +30,10 @@ public class EchoController {
     private OrderRepository orderRepository;
 
     @Autowired
+    private ProductRepository productRepository;
+
+
+    @Autowired
     private Cart_itemRepository cartItemRepository;
     @PostMapping("/auth/register")
     public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest) {
@@ -36,6 +43,7 @@ public class EchoController {
             // Crear el usuario
             User user = new User();
             user.setUsername(registerRequest.getUsername());
+
             user.setEmail(registerRequest.getEmail());
             user.setPassword(registerRequest.getPassword());
 
@@ -56,6 +64,20 @@ public class EchoController {
     }
 
 
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest) {
+        Optional<User> userOptional = repositoryUser.searchByLogin(loginRequest.getUsername(), loginRequest.getPassword());
+
+        if (userOptional.isPresent()) {
+            return ResponseEntity.ok(new LoginResponse("Inicio de sesión exitoso"));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new LoginResponse("Credenciales incorrectas"));
+        }
+    }
+
+
+
 
     @DeleteMapping("/remove/{itemId}")
     public ResponseEntity<?> removeCartItem(@PathVariable Long itemId) {
@@ -66,8 +88,25 @@ public class EchoController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/api/products")
+    public ResponseEntity<?> getProducts() {
 
-    @PostMapping("/create")
+        List<Product> products = (List<Product>) productRepository.findAll();
+
+        if (products.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No hay productos disponibles");
+        }else {
+            return ResponseEntity.ok(products);
+        }
+
+    }
+
+
+
+
+
+
+    @PostMapping("/api/order/create")
     public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
         Optional<User> userOptional = repositoryUser.findById(1L); // Usuario fijo para pruebas
 

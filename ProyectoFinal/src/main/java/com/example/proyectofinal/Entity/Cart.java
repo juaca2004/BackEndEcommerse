@@ -19,7 +19,7 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CartItem> cartItems = new ArrayList<>();
+    private List<Cart_item> cartItems = new ArrayList<>();
 
     public Cart() {
     }
@@ -43,11 +43,11 @@ public class Cart {
         this.user = user;
     }
 
-    public List<CartItem> getCartItems() {
+    public List<Cart_item> getCartItems() {
         return cartItems;
     }
 
-    public void setCartItems(List<CartItem> cartItems) {
+    public void setCartItems(List<Cart_item> cartItems) {
         this.cartItems = cartItems;
     }
 }
