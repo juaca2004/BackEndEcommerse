@@ -125,7 +125,7 @@ public class EchoController {
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(new CartItemResponse("El producto ya está en el carrito"));
 
                 } else {
-
+                    System.out.println("llegue aqui");
                     Cart_item cartItem = new Cart_item(cart, product, 1);
                     cart.getCartItems().add(cartItem);
                     cartItemRepository.save(cartItem);
