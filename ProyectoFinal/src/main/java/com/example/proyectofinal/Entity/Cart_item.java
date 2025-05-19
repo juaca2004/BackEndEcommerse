@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -12,6 +13,7 @@ public class Cart_item {
     // Muchos CartItems pertenecen a un solo Cart
     @ManyToOne
     @JoinColumn(name = "cart_id", nullable = false)
+    @JsonBackReference
     private Cart cart;
 
     // Muchos CartItems pueden referenciar el mismo producto

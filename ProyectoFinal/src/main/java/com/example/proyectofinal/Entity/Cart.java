@@ -1,5 +1,7 @@
 package com.example.proyectofinal.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -16,9 +18,11 @@ public class Cart {
     // Relación uno a uno con User
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JsonBackReference
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Cart_item> cartItems = new ArrayList<>();
 
     public Cart() {

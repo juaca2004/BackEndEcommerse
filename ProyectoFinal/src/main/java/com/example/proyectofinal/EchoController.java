@@ -52,7 +52,7 @@ public class EchoController {
             repositoryUser.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(new RegisterResponse("Cliente registrado exitosamente"));
+                    .body(user);
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new RegisterResponse("El cliente con ese nombre de usuario ya existe"));
@@ -62,10 +62,11 @@ public class EchoController {
 
     @PostMapping("/auth/login")
     public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest) {
-        Optional<User> userOptional = repositoryUser.searchByLogin(loginRequest.getUsername(), loginRequest.getPassword());
-
+        var userOptional = repositoryUser.searchByLogin(loginRequest.getUsername(), loginRequest.getPassword());
         if (userOptional.isPresent()) {
-            return ResponseEntity.ok(new LoginResponse("Inicio de sesión exitoso"));
+            System.out.println("ENTREEE");
+            System.out.println(userOptional.get());
+            return ResponseEntity.status(200).body(userOptional.get());
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(new LoginResponse("Credenciales incorrectas"));

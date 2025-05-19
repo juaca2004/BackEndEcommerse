@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 
@@ -14,6 +15,7 @@ public class Order_item {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
+    @JsonBackReference
     private Order order;
 
     @ManyToOne

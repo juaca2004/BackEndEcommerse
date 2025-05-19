@@ -1,6 +1,7 @@
 package com.example.proyectofinal.Entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.util.List;
 
@@ -11,10 +12,6 @@ public class User {
 
     private Long id;
 
-    private String name;
-
-    private String lastname;
-
     private String email;
 
     private String username;
@@ -23,9 +20,11 @@ public class User {
 
     // Relación uno a uno con Cart (bidireccional)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Cart cart;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Order> orders;
 
 
@@ -45,22 +44,6 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
     }
 
 
