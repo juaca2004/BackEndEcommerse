@@ -1,17 +1,10 @@
 package com.example.proyectofinal;
 
-import com.example.proyectofinal.Entity.Cart;
-import com.example.proyectofinal.Entity.Product;
-import com.example.proyectofinal.Entity.User;
-import com.example.proyectofinal.Entity.Order;
-import com.example.proyectofinal.Repository.Cart_itemRepository;
-import com.example.proyectofinal.Repository.OrderRepository;
-import com.example.proyectofinal.Repository.ProductRepository;
-import com.example.proyectofinal.Repository.UserRepository;
+import com.example.proyectofinal.Entity.*;
+import com.example.proyectofinal.Repository.*;
 import com.example.proyectofinal.ResponseRequest.RegisterRequest;
 import com.example.proyectofinal.ResponseRequest.*;
 import com.example.proyectofinal.ResponseRequest.RegisterResponse;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,9 +25,12 @@ public class EchoController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CartRepository cartRepository;
+
 
     @Autowired
-    private Cart_itemRepository cartItemRepository;
+    private CartItemRepository cartItemRepository;
     @PostMapping("/auth/register")
     public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest) {
         Optional<User> existingClient = repositoryUser.findByUsername(registerRequest.getUsername());
@@ -101,9 +97,65 @@ public class EchoController {
 
     }
 
+    @PostMapping("/cart/add/{userId}/{productId}")
+    public ResponseEntity<?> addProductToCart(@PathVariable Long userId,@PathVariable Long productId) {
+        Optional<User> userOptional = repositoryUser.findById(userId);
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        } else {
+
+            Optional<Product> productOptional = productRepository.findById(productId);
+
+            if (productOptional.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Producto no encontrado");
+            }else {
+
+                User user = userOptional.get();
+                Product product = productOptional.get();
+
+                Cart cart = user.getCart();
+
+                // Verificar si el producto ya está en el carrito
+                boolean productExists = cart.getCartItems().stream()
+                        .anyMatch(cartItem -> cartItem.getProduct().getId().equals(productId));
+
+                if (productExists) {
+
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(new CartItemResponse("El producto ya está en el carrito"));
+
+                } else {
+
+                    Cart_item cartItem = new Cart_item(cart, product, 1);
+                    cart.getCartItems().add(cartItem);
+                    cartItemRepository.save(cartItem);
+                    return ResponseEntity.status(HttpStatus.CREATED).body(new CartItemResponse("Producto agregado al carrito"));
+                }
+            }
+        }
+
+    }
+
+    @GetMapping("/api/cart/{userId}")
+    public ResponseEntity<?> getCartItems(@PathVariable Long userId) {
+
+      try{
+
+          Optional<Cart> cart = cartRepository.findCartByUserId(userId);
+            if (cart.isEmpty()) {
+
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Carrito no encontrado");
+            }else {
+
+                CartResponse response = new CartResponse(cart.get().getCartItems());
+
+                return ResponseEntity.ok(response);
+            }
 
 
-
+      } catch (Exception e) {
+          throw new RuntimeException(e);
+      }
+    }
 
 
     @PostMapping("/api/order/create")
