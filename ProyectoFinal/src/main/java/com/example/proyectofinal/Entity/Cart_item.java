@@ -19,6 +19,7 @@ public class Cart_item {
     // Muchos CartItems pueden referenciar el mismo producto
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference
     private Product product;
 
     @Column(nullable = false)

@@ -1,6 +1,7 @@
 package com.example.proyectofinal.Entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -38,6 +39,7 @@ public class Order {
     private String status = "pending";
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Order_item> items;
 
     public Order() {}

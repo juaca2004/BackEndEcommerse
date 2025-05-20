@@ -28,9 +28,12 @@ public class EchoController {
     @Autowired
     private CartRepository cartRepository;
 
-
     @Autowired
     private CartItemRepository cartItemRepository;
+
+    @Autowired
+    private  OrderItemRepository orderItemRepository;
+
     @PostMapping("/auth/register")
     public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest) {
         Optional<User> existingClient = repositoryUser.findByUsername(registerRequest.getUsername());
@@ -76,13 +79,12 @@ public class EchoController {
 
 
 
-    @DeleteMapping("/remove/{itemId}")
-    public ResponseEntity<?> removeCartItem(@PathVariable Long itemId) {
-        return cartItemRepository.findById(itemId).map(item -> {
-            // Eliminar el Cart_item
+    @DeleteMapping("/remove/{userId}/{itemId}")
+    public ResponseEntity<?> removeCartItem(@PathVariable Long userId, @PathVariable Long itemId) {
+        return cartItemRepository.findByIdAndUserId(itemId, userId).map(item -> {
             cartItemRepository.delete(item);
             return ResponseEntity.ok().build();
-        }).orElse(ResponseEntity.notFound().build());
+        }).orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("el producto no fue encontrado en el carrito"));
     }
 
     @GetMapping("/api/products")
@@ -159,29 +161,56 @@ public class EchoController {
     }
 
 
-    @PostMapping("/api/order/create")
-    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest) {
-        Optional<User> userOptional = repositoryUser.findById(1L); // Usuario fijo para pruebas
+    @PostMapping("/api/order/create/{userId}")
+    public ResponseEntity<?> createOrder(@RequestBody OrderRequest orderRequest,@PathVariable Long userId) {
+        // Obtener usuario
+        User user = repositoryUser.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
-        if (userOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+        // Obtener carrito del usuario
+        Cart cart = cartRepository.findCartByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Carrito no encontrado"));
+
+        List<Cart_item> cartItems = cart.getCartItems();
+        if (cartItems.isEmpty()) {
+            return ResponseEntity.badRequest().body("El carrito está vacío");
         }
 
-        User user = userOptional.get();
+        // Calcular total
+        BigDecimal total = cartItems.stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        System.out.println(total);
 
-        Order order = new Order();
-        order.setUser(user);
-        order.setCity(orderRequest.getShipping().getCity());
-        order.setAddress(orderRequest.getShipping().getAddress());
-        order.setFullName(orderRequest.getShipping().getFullName());
-        order.setTypePayment(orderRequest.getPaymentMethod());
-        order.setTotal(BigDecimal.valueOf(100)); // Puedes calcularlo dinámicamente con el carrito
-        order.setStatus("Exitosa");
+        // Crear orden
+        Order order = new Order(user, total, orderRequest.getShipping().getCity(), orderRequest.getShipping().getAddress(), orderRequest.getShipping().getFullName(), orderRequest.getPaymentMethod(), "paid");
+        order = orderRepository.save(order);
 
-        orderRepository.save(order);
+        // Procesar cada ítem del carrito
+        for (Cart_item cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            int quantity = cartItem.getQuantity();
+            BigDecimal price = cartItem.getProduct().getPrice();
+            if (product.getStock() < quantity) {
+                throw new RuntimeException("Stock insuficiente para el producto: " + product.getName());
+            }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body("Orden creada exitosamente");
+            // Actualizar stock
+            product.setStock(product.getStock() - quantity);
+            productRepository.save(product);
+
+            // Guardar ítem de la orden
+            Order_item orderItem = new Order_item(order,product,quantity,price);
+            orderItemRepository.save(orderItem);
+        }
+
+        // Vaciar el carrito
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+
+        return ResponseEntity.ok(order);
     }
+
 
 }

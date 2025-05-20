@@ -20,6 +20,7 @@ public class Order_item {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonBackReference
     private Product product;
 
     @Column(nullable = false)
@@ -29,6 +30,13 @@ public class Order_item {
     private BigDecimal price;
 
     public Order_item() {
+    }
+
+    public Order_item(Order order, Product product, Integer quantity, BigDecimal price) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
     }
 
     public Integer getItemId() {

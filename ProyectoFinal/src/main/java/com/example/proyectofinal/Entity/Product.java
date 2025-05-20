@@ -1,5 +1,6 @@
 package com.example.proyectofinal.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,9 +22,11 @@ public class Product {
 
     // Relación opcional: un producto puede estar en muchos cartItems
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<Cart_item> cartItems;
 
     @OneToMany(mappedBy = "product")
+    @JsonManagedReference
     private List<Order_item> orderItems;
 
     public Product() {

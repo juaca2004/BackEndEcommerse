@@ -7,13 +7,13 @@ import java.math.BigDecimal;
 public class CartItemResponse {
 
     private Long id;
-    private String productName;
+    private String name;
     private int quantity;
     private BigDecimal price;
 
     public CartItemResponse(Cart_item item) {
-        this.id = item.getProduct().getId();
-        this.productName = item.getProduct().getName();
+        this.id = item.getId();
+        this.name = item.getProduct().getName();
         this.price = item.getProduct().getPrice();
         this.quantity = item.getQuantity();
     }
@@ -26,12 +26,12 @@ public class CartItemResponse {
         this.id = id;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getName() {
+        return name;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getQuantity() {
