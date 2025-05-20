@@ -34,7 +34,7 @@ public class EchoController {
     @Autowired
     private  OrderItemRepository orderItemRepository;
 
-    @PostMapping("/auth/register")
+    @PostMapping("/api/auth/register")
     public ResponseEntity<?> registerClient(@RequestBody RegisterRequest registerRequest) {
         Optional<User> existingClient = repositoryUser.findByUsername(registerRequest.getUsername());
 
@@ -63,7 +63,7 @@ public class EchoController {
     }
 
 
-    @PostMapping("/auth/login")
+    @PostMapping("/api/auth/login")
     public ResponseEntity<?> loginClient(@RequestBody LoginRequest loginRequest) {
         var userOptional = repositoryUser.searchByLogin(loginRequest.getUsername(), loginRequest.getPassword());
         if (userOptional.isPresent()) {
@@ -79,7 +79,7 @@ public class EchoController {
 
 
 
-    @DeleteMapping("/remove/{userId}/{itemId}")
+    @DeleteMapping("/api/remove/{userId}/{itemId}")
     public ResponseEntity<?> removeCartItem(@PathVariable Long userId, @PathVariable Long itemId) {
         return cartItemRepository.findByIdAndUserId(itemId, userId).map(item -> {
             cartItemRepository.delete(item);
@@ -100,7 +100,7 @@ public class EchoController {
 
     }
 
-    @PostMapping("/cart/add/{userId}/{productId}")
+    @PostMapping("/api/cart/add/{userId}/{productId}")
     public ResponseEntity<?> addProductToCart(@PathVariable Long userId,@PathVariable Long productId) {
         Optional<User> userOptional = repositoryUser.findById(userId);
         if (userOptional.isEmpty()) {
