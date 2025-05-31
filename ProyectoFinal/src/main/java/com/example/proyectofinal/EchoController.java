@@ -52,10 +52,10 @@ public class EchoController {
             user.setCart(cart); // Bidireccional: aseguramos que ambos se conozcan
 
             // Guardar el usuario (gracias al cascade, Cart también se guarda)
-            repositoryUser.save(user);
+            User savedUser = repositoryUser.save(user);
 
             return ResponseEntity.status(HttpStatus.OK)
-                    .body(user);
+                    .body(savedUser);
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new RegisterResponse("El cliente con ese nombre de usuario ya existe"));
